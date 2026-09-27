@@ -652,6 +652,7 @@ static void YouModAddEndTime(YTPlayerViewController *self, YTSingleVideoControll
 %end
 
 %ctor {
+    YouModRegisterDefaults();
     %init;
     if (IS_ENABLED(OldQualityPicker)) {
         %init(OldVideoQuality);

@@ -266,6 +266,9 @@ jobs:
           repository: ${{ inputs.repo }}
           ref: ${{ inputs.branch }}
           path: YouMod
+          # ~20 third-party repos get cloned and their Makefiles run as part of this
+          # job - don't leave a contents:write token sitting in .git/config for them.
+          persist-credentials: false
 
       - name: Clone Open in YouTube (Safari Extension)
         run: |
@@ -518,14 +521,21 @@ jobs:
           mv packages/*.deb ${{ github.workspace }}/volboostyt.deb
           
       - name: Inject Tweaks Into IPA
+        env:
+          DISPLAY_NAME: ${{ inputs.display_name }}
+          BUNDLE_ID: ${{ inputs.bundle_id }}
+          YT_VERSION: ${{ env.YT_VERSION }}
+          YOUMOD_VERSION: ${{ env.YOUMOD_VERSION }}
         run: |
           tweaks="OpenYouTubeSafariExtension.appex"
 
           for f in *.deb; do
             tweaks="$tweaks $f"
           done
-          
-          cyan -i youtube.ipa -o YouMod_${{ env.YT_VERSION }}_v${{ env.YOUMOD_VERSION }}.ipa -uwef $tweaks -n "${{ inputs.display_name }}" -b ${{ inputs.bundle_id }}
+
+          # Inputs go through env vars instead of being interpolated straight into
+          # the script, so an odd display name / bundle id can't break out of quotes.
+          cyan -i youtube.ipa -o "YouMod_${YT_VERSION}_v${YOUMOD_VERSION}.ipa" -uwef $tweaks -n "$DISPLAY_NAME" -b "$BUNDLE_ID"
 
       - name: Create a Draft Release
         uses: softprops/action-gh-release@v3

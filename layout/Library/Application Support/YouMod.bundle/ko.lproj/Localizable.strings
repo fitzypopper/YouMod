@@ -110,6 +110,7 @@
 "RIGHT_SIDE_GESTURE" = "우측 스와이프 제스처 기능";
 "GESTURE_BRIGHTNESS" = "밝기 조절";
 "GESTURE_VOLUME" = "볼륨 조절";
+"GESTURE_SPEED" = "재생 속도";
 "GESTURE_NONE" = "사용 안 함";
 "GESTURE_HUD" = "제스처 수치 알림창 켜기";
 "GESTURE_HUD_DESC" = "밝기나 볼륨을 조절할 때 화면에 현재 수치(%)를 보여줍니다.";

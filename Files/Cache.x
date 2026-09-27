@@ -5,7 +5,12 @@
 %new
 - (void)YouModAutoClearCache {
     NSString *cachePath = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
-    [[NSFileManager defaultManager] removeItemAtPath:cachePath error:nil];
+    // Clear the contents, not the directory itself - removing NSCachesDirectory
+    // leaves every later cache write failing with ENOENT until it is recreated.
+    NSArray <NSString *> *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cachePath error:nil];
+    for (NSString *item in contents) {
+        [[NSFileManager defaultManager] removeItemAtPath:[cachePath stringByAppendingPathComponent:item] error:nil];
+    }
 }
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     BOOL result = %orig;
