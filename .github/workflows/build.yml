@@ -28,9 +28,12 @@ jobs:
       - name: Checkout YouMod
         uses: actions/checkout@v7
         with:
-          repository: ${{ inputs.repo }}
-          ref: ${{ inputs.branch }}
+          # On push events inputs.* is empty, so fall back to this repo + the ref
+          # that actually triggered the workflow.
+          repository: ${{ inputs.repo || github.repository }}
+          ref: ${{ inputs.branch || github.ref }}
           path: YouMod
+          persist-credentials: false
 
       - name: Install dependencies
         run: brew install make ldid

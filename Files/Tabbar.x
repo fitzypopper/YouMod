@@ -52,7 +52,10 @@ BOOL isTabSelected = NO;
     %orig;
     if (!isTabSelected) {
         NSArray *pivotIdentifiers = @[@"FEwhat_to_watch", @"FEshorts", @"FEsubscriptions", @"FElibrary"];
-        [self selectItemWithPivotIdentifier:pivotIdentifiers[INTFORVAL(DefaultTab)]]; // Set int here
+        // Clamp so a tampered/imported value can never index out of bounds and crash on launch.
+        NSInteger defaultTab = INTFORVAL(DefaultTab);
+        if (defaultTab < 0 || defaultTab >= (NSInteger)pivotIdentifiers.count) defaultTab = 0;
+        [self selectItemWithPivotIdentifier:pivotIdentifiers[defaultTab]]; // Set int here
         isTabSelected = YES;
     }
 }

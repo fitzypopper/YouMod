@@ -4,6 +4,12 @@
 
 #define TweakName @"YouMod"
 
+// Injected from the Makefile by reading control's Version: field, so the shown
+// version can never drift from the packaged one.
+#ifndef YOUMOD_VERSION
+#define YOUMOD_VERSION "unknown"
+#endif
+
 #define LOC(x) [tweakBundle localizedStringForKey:x value:nil table:nil]
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -101,7 +107,7 @@ static NSString *GetCacheSize() { // YTLite - @dayanch96
 
     // Tweak Version (at the top)
     // Thanks to the original codes from YTweaks by fosterbarnes - https://github.com/fosterbarnes/YTweaks/blob/e921591a89b87256a2b37c4788bd99282f70d9c2/Settings.x
-    YTSettingsSectionItem *tweakVersion = [YTSettingsSectionItemClass itemWithTitle:@"YouMod v1.3.0"
+    YTSettingsSectionItem *tweakVersion = [YTSettingsSectionItemClass itemWithTitle:[NSString stringWithFormat:@"YouMod v%s", YOUMOD_VERSION]
         titleDescription:nil
         accessibilityIdentifier:nil
         detailTextBlock:nil
@@ -184,7 +190,7 @@ static NSString *GetCacheSize() { // YTLite - @dayanch96
             SETTINGS_HEADER,
             BASIC_SWITCH(LOC(@"DOWNLOAD_MANAGER"), LOC(@"DOWNLOAD_MANAGER_DESC"), DownloadManager),
             BASIC_SWITCH(LOC(@"DOWNLOAD_SAVE_PHOTOS"), LOC(@"DOWNLOAD_SAVE_PHOTOS_DESC"), DownloadSaveToPhotos),
-            BASIC_SWITCH(LOC(@"DOWNLOAD_DRC_AUDIO"), LOC(@"DOWNLOAD_DRC_AUDIO"), DownloadPreferDRCAudio),
+            BASIC_SWITCH(LOC(@"DOWNLOAD_DRC_AUDIO"), LOC(@"DOWNLOAD_DRC_AUDIO_DESC"), DownloadPreferDRCAudio),
         ];
         YTSettingsPickerViewController *picker = [[%c(YTSettingsPickerViewController) alloc] initWithNavTitle:LOC(@"DOWNLOADING") pickerSectionTitle:nil rows:rows selectedItemIndex:0 parentResponder:[self parentResponder]];
         [settingsViewController pushViewController:picker];
@@ -458,7 +464,7 @@ static NSString *GetCacheSize() { // YTLite - @dayanch96
                         [settingsViewController reloadData];
                         return YES;
                     }],
-                    [YTSettingsSectionItemClass checkmarkItemWithTitle:LOC(@"Shorts") titleDescription:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+                    [YTSettingsSectionItemClass checkmarkItemWithTitle:LOC(@"SHORTS") titleDescription:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
                         [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:DefaultTab];
                         [settingsViewController reloadData];
                         return YES;
@@ -578,7 +584,12 @@ static NSString *GetCacheSize() { // YTLite - @dayanch96
                 selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                         NSString *cachePath = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
-                        [[NSFileManager defaultManager] removeItemAtPath:cachePath error:nil];
+                        // Clear the contents, not the directory itself - removing NSCachesDirectory
+                        // leaves every later cache write failing with ENOENT until it is recreated.
+                        NSArray <NSString *> *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cachePath error:nil];
+                        for (NSString *item in contents) {
+                            [[NSFileManager defaultManager] removeItemAtPath:[cachePath stringByAppendingPathComponent:item] error:nil];
+                        }
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"DONE") firstResponder:[self parentResponder]] send];
                         });
@@ -615,17 +626,24 @@ static NSString *GetCacheSize() { // YTLite - @dayanch96
 
 %end
 
+void YouModRegisterDefaults(void) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+            AutoClearCache: @YES,
+            YTPremiumLogo: @YES,
+            HideCreateButton: @YES,
+            HideCastButtonNav: @YES,
+            HideCastButtonPlayer: @YES,
+            BackgroundPlayback: @YES,
+            OldQualityPicker: @YES,
+            DownloadManager: @YES,
+            DownloadSaveToPhotos: @YES,
+        }];
+    });
+}
+
 %ctor {
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-        AutoClearCache: @YES,
-        YTPremiumLogo: @YES,
-        HideCreateButton: @YES,
-        HideCastButtonNav: @YES,
-        HideCastButtonPlayer: @YES,
-        BackgroundPlayback: @YES,
-        OldQualityPicker: @YES,
-        DownloadManager: @YES,
-        DownloadSaveToPhotos: @YES,
-    }];
+    YouModRegisterDefaults();
     %init;
 }

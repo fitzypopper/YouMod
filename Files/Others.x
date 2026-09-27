@@ -147,6 +147,7 @@ Class YTILikeResponseClass, YTIDislikeResponseClass, YTIRemoveLikeResponseClass;
 %end
 
 %ctor {
+    YouModRegisterDefaults();
     YTILikeResponseClass = %c(YTILikeResponse);
     YTIDislikeResponseClass = %c(YTIDislikeResponse);
     YTIRemoveLikeResponseClass = %c(YTIRemoveLikeResponse);

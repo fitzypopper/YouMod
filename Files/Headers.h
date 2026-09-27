@@ -241,6 +241,11 @@ typedef NS_ENUM(NSUInteger, GestureSection) {
 - (void)YouModAutoClearCache;
 @end
 
+// Registers the default NSUserDefaults values. Must be called at the top of every
+// %ctor that gates %init() on IS_ENABLED(...), otherwise ctor order (which is link
+// order across files) can make a registered default look like NO on launch.
+void YouModRegisterDefaults(void);
+
 // Custom perferences logics
 @interface YouModPrefsManager : NSObject <UIDocumentPickerDelegate>
 + (instancetype)sharedManager;

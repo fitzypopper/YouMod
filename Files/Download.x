@@ -1472,13 +1472,20 @@ static NSURL *YouModThumbnailURLForVideoID(NSString *videoID) {
 }
 
 static void YouModRequestPhotoAccess(void (^completion)(BOOL granted)) {
+    // PHAuthorizationStatus handlers are delivered on an arbitrary queue, but callers
+    // show toasts/alerts - always hop back to the main thread before completing.
+    void (^finish)(BOOL) = ^(BOOL granted) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(granted);
+        });
+    };
     if (@available(iOS 14.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelAddOnly handler:^(PHAuthorizationStatus status) {
-            completion(status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited);
+            finish(status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited);
         }];
     } else {
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            completion(status == PHAuthorizationStatusAuthorized);
+            finish(status == PHAuthorizationStatusAuthorized);
         }];
     }
 }

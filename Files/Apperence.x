@@ -85,6 +85,7 @@ static BOOL isDarkMode(UIView *view) {
 %end
 
 %ctor {
+    YouModRegisterDefaults();
     if (IS_ENABLED(OLEDTheme)) {
         %init(OLEDTheme);
     }

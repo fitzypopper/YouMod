@@ -79,6 +79,7 @@ static NSMutableArray <YTIItemSectionRenderer *> *filteredArray(NSArray <YTIItem
 %end
 
 %ctor {
+    YouModRegisterDefaults();
     %init;
     if (IS_ENABLED(HideShortsShelf)) {
         %init(Shorts);

@@ -60,29 +60,32 @@ static NSBundle *YouModBundle() {
         [alertView show];
         return;
     }
-    BOOL foundKeys = NO;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    // Collect the YouMod keys first - never wipe the existing settings before we
+    // know the file actually contains anything to import.
+    NSMutableDictionary *importedYouModKeys = [NSMutableDictionary dictionary];
+    for (NSString *key in importedData) {
+        if ([key hasPrefix:Prefix]) {
+            importedYouModKeys[key] = importedData[key];
+        }
+    }
+    // Check if there's any YouMod key
+    if (importedYouModKeys.count == 0) {
+        YTAlertView *alertView = [%c(YTAlertView) infoDialog];
+        alertView.title = LOC(@"ERROR");
+        alertView.subtitle = LOC(@"ERROR_NO_KEYS_IMPORT");
+        [alertView show];
+        return;
+    }
     // Remove old keys
     for (NSString *key in [defaults dictionaryRepresentation]) {
         if ([key hasPrefix:Prefix]) {
             [defaults removeObjectForKey:key];
         }
     }
-    [defaults synchronize];
-    // Set new key from file
-    for (NSString *key in importedData) {
-        if ([key hasPrefix:Prefix]) {
-            [defaults setObject:importedData[key] forKey:key];
-            foundKeys = YES;
-        }
-    }
-    // Check if there's any YouMod key
-    if (!foundKeys) {
-        YTAlertView *alertView = [%c(YTAlertView) infoDialog];
-        alertView.title = LOC(@"ERROR");
-        alertView.subtitle = LOC(@"ERROR_NO_KEYS_IMPORT");
-        [alertView show];
-        return;
+    // Set new keys from file
+    for (NSString *key in importedYouModKeys) {
+        [defaults setObject:importedYouModKeys[key] forKey:key];
     }
     [defaults synchronize];
     // Success Alert with Restart
