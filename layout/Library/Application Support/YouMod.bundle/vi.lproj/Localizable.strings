@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "Cho phép sao chép nội dung bình luận và lưu bình luận dưới dạng hình ảnh bằng cách nhấn giữ lâu vào nút ba dấu chấm.";
 "DOWNLOAD_POST" = "Lưu thông tin bài đăng";
 "DOWNLOAD_POST_DESC" = "Cho phép sao chép nội dung bài đăng và lưu bài đăng dưới dạng hình ảnh bằng cách nhấn giữ lâu.";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "Dịch bình luận";
 "TRANSLATE_POST" = "Dịch bài đăng";
 "SERVER_EUROPRE1" = "Châu Âu";

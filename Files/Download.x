@@ -1933,6 +1933,14 @@ static void YouModShowThumbnailSheet(YTPlayerViewController *player, UIViewContr
     YouModPresentMenu(nil, items, presenter, sender);
 }
 
+static void YouModShowDownloadManager(YTPlayerViewController *player, UIViewController *presenter, UIView *sender, BOOL isShorts);
+
+// Fallback entry point used from the YouMod settings - opens the manager directly
+// so it never depends on YouTube's own Download button cooperating.
+void YouModOpenDownloadManager(UIViewController *presenter) {
+    YouModShowDownloadManager(YouModCurrentPlayerViewController, presenter, presenter.view, NO);
+}
+
 static void YouModShowDownloadManager(YTPlayerViewController *player, UIViewController *presenter, UIView *sender, BOOL isShorts) {
     if (!player) {
         YouModSendError(LOC(@"OPEN_VID_BEFORE"));
@@ -2017,16 +2025,26 @@ NSString *YouModGlobalAuthHeader = nil;
 
 void YouModConfigureDownloadButton(_ASDisplayView *view) {
     if (!IS_ENABLED(DownloadManager)) return;
-    if (objc_getAssociatedObject(view, @selector(YouModDownloadButtonTapped:))) return;
+    // Note: the identifier is often not set yet when didMoveToWindow fires, so this
+    // also runs from setAccessibilityIdentifier: - see the hook below.
+    if (![view.accessibilityIdentifier isEqualToString:@"id.ui.add_to.offline.button"]) return;
 
-    if ([view.accessibilityIdentifier isEqualToString:@"id.ui.add_to.offline.button"]) {
+    UITapGestureRecognizer *tap = objc_getAssociatedObject(view, @selector(YouModDownloadButtonTapped:));
+    if (![tap isKindOfClass:[UITapGestureRecognizer class]]) {
         view.userInteractionEnabled = YES;
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:view action:@selector(YouModDownloadButtonTapped:)];
+        tap = [[UITapGestureRecognizer alloc] initWithTarget:view action:@selector(YouModDownloadButtonTapped:)];
         tap.cancelsTouchesInView = YES;
         tap.delaysTouchesBegan = YES;
         tap.delaysTouchesEnded = YES;
         [view addGestureRecognizer:tap];
-        objc_setAssociatedObject(view, @selector(YouModDownloadButtonTapped:), @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(view, @selector(YouModDownloadButtonTapped:), tap, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+
+    // YouTube attaches its own recognizers to this button to present the Premium
+    // download prompt. Cancelling touches doesn't stop recognizers, so make every
+    // recognizer on this view wait for ours - ours wins, YouTube's never fires.
+    for (UIGestureRecognizer *existing in view.gestureRecognizers) {
+        if (existing != tap) [existing requireGestureRecognizerToFail:tap];
     }
 }
 
@@ -2148,6 +2166,13 @@ static UIImage *YouModExtractPostImage(UIView *cellView) {
 */
 
 %hook _ASDisplayView
+
+// The identifier is often assigned after the view is already in a window, so
+// (re)try the download-button wiring whenever it appears.
+- (void)setAccessibilityIdentifier:(NSString *)identifier {
+    %orig;
+    YouModConfigureDownloadButton(self);
+}
 
 - (void)didMoveToWindow {
     %orig;

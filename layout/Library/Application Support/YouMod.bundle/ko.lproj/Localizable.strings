@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "점 세 개 버튼을 길게 눌러 댓글 텍스트를 복사하거나 댓글을 이미지로 저장할 수 있습니다.";
 "DOWNLOAD_POST" = "게시물 정보 저장";
 "DOWNLOAD_POST_DESC" = "길게 눌러 게시물 텍스트를 복사하거나 게시물을 이미지로 저장할 수 있습니다.";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "댓글 번역";
 "TRANSLATE_POST" = "게시물 번역";
 "SERVER_EUROPRE1" = "유럽";

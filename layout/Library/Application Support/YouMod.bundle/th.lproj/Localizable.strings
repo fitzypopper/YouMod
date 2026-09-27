@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "อนุญาตให้คัดลอกข้อความคอมเมนต์และบันทึกคอมเมนต์เป็นรูปภาพโดยการแตะปุ่มสามจุดค้างไว้";
 "DOWNLOAD_POST" = "บันทึกข้อมูลโพสต์";
 "DOWNLOAD_POST_DESC" = "อนุญาตให้คัดลอกข้อความโพสต์และบันทึกโพสต์เป็นรูปภาพโดยการแตะค้างไว้";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "แปลคอมเมนต์";
 "TRANSLATE_POST" = "แปลโพสต์";
 "SERVER_EUROPRE1" = "ยุโรป";

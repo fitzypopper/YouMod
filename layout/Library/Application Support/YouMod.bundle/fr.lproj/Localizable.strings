@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "Permet de copier le texte d'un commentaire et de l'enregistrer sous forme d'image par un appui long sur le bouton des trois points.";
 "DOWNLOAD_POST" = "Enregistrer les informations de la publication";
 "DOWNLOAD_POST_DESC" = "Permet de copier le texte d'une publication et de l'enregistrer sous forme d'image par un appui long.";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "Traduire le commentaire";
 "TRANSLATE_POST" = "Traduire la publication";
 "SERVER_EUROPRE1" = "Europe";

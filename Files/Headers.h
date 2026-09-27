@@ -559,6 +559,10 @@ typedef NS_ENUM(NSUInteger, GestureSection) {
 // order across files) can make a registered default look like NO on launch.
 void YouModRegisterDefaults(void);
 
+// Opens the Download manager without going through YouTube's own Download button
+// (which may show the Premium prompt instead). Declared for Settings.x.
+void YouModOpenDownloadManager(UIViewController *presenter);
+
 @interface YouModPrefsManager : NSObject <UIDocumentPickerDelegate>
 + (instancetype)sharedManager;
 - (void)exportYouModSettingsFromVC:(UIViewController *)vc;

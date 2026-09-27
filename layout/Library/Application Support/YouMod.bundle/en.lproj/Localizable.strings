@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "Allows to copy comment text and save comment as image by long tap on the three dots button.";
 "DOWNLOAD_POST" = "Save post information";
 "DOWNLOAD_POST_DESC" = "Allows to copy post text and save post as image by long tap.";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "Translate comment";
 "TRANSLATE_POST" = "Translate post";
 "SERVER_EUROPRE1" = "Europe";

@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "Üç nokta butonuna uzun basarak yorum metnini kopyalamaya ve yorumu görsel olarak kaydetmeye izin verir.";
 "DOWNLOAD_POST" = "Gönderi bilgilerini kaydet";
 "DOWNLOAD_POST_DESC" = "Uzun basarak gönderi metnini kopyalamaya ve gönderiyi görsel olarak kaydetmeye izin verir.";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "Yorumu çevir";
 "TRANSLATE_POST" = "Gönderiyi çevir";
 "SERVER_EUROPRE1" = "Avrupa";

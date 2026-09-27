@@ -210,6 +210,11 @@ static NSString *GetCacheSize() { // YTLite - @dayanch96
             [[YMPicker(YMLOC(@"DOWNLOAD_SERVER"), YMLOC(@"CHOOSE_DOWNLOAD_SERVER"), DownloadServerIndex, (@[YMLOC(@"SERVER_EUROPRE1"), YMLOC(@"SERVER_ASIA1")]), 0) visibleWhenKey:DownloadMethod equals:1] visibleWhenAnyBoolKey:@[DownloadManager, AddDownloadToShorts]],
             YMToggle(YMLOC(@"DOWNLOAD_COMMENT"), YMLOC(@"DOWNLOAD_COMMENT_DESC"), DownloadComment),
             YMToggle(YMLOC(@"DOWNLOAD_POST"), YMLOC(@"DOWNLOAD_POST_DESC"), DownloadPost),
+            // Direct entry point - works even when YouTube's own Download button
+            // still presents the Premium prompt instead of our menu.
+            [YMAction(YMLOC(@"OPEN_DOWNLOAD_MANAGER"), YMLOC(@"OPEN_DOWNLOAD_MANAGER_DESC"), ^(UIViewController *vc) {
+                YouModOpenDownloadManager(vc);
+            }) visibleWhenBoolKey:DownloadManager],
     ];
     YMRegisterSettingsGroup(YMLOC(@"DOWNLOADING"), downloadingItems);
     YTSettingsSectionItem *downloadinggroup = [YTSettingsSectionItemClass itemWithTitle:YMLOC(@"DOWNLOADING") accessibilityIdentifier:nil detailTextBlock:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
