@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "长按三点菜单按钮可复制评论文字或保存评论图片。";
 "DOWNLOAD_POST" = "保存帖子信息";
 "DOWNLOAD_POST_DESC" = "长按可复制帖子文字或保存帖子图片。";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "翻译评论";
 "TRANSLATE_POST" = "翻译帖子";
 "SERVER_EUROPRE1" = "欧洲";

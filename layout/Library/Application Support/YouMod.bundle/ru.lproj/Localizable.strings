@@ -120,6 +120,8 @@
 "DOWNLOAD_COMMENT_DESC" = "Позволяет скопировать текст комментария и сохранить комментарий как изображение долгим нажатием на кнопку с тремя точками.";
 "DOWNLOAD_POST" = "Сохранение информации о публикациях";
 "DOWNLOAD_POST_DESC" = "Позволяет скопировать текст публикации и сохранить публикацию как изображение долгим нажатием.";
+"OPEN_DOWNLOAD_MANAGER" = "Open download manager";
+"OPEN_DOWNLOAD_MANAGER_DESC" = "Opens the download menu directly, without using YouTube's own Download button.";
 "TRANSLATE_COMMENT" = "Перевести комментарий";
 "TRANSLATE_POST" = "Перевести публикацию";
 "SERVER_EUROPRE1" = "Европа";
