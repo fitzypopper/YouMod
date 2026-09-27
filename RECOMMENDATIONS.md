@@ -86,19 +86,45 @@ uYouEnhanced's own "Lightweight Alternative - YouMod" section names these cons. 
 
 ---
 
-## 5. The download manager (biggest differentiator left)
+## 5. Downloading "like Premium" (biggest differentiator left)
 
-YTLite's headline feature is a real download manager. YouMod has a solid downloader (range requests, 8-way chunking, AVFoundation merge, Photos export) but:
+### First, the hard truth about Premium downloads
 
-- **No queue** — starting a second download just shows *"Already downloading"*.
-- **No library / resume** — files land in `Documents/YouMod Downloads` but there's no in-app list, no resume, no cancel, no delete, no offline playback.
-- **No progress history** — only a transient alert.
+YouTube Premium's *Library → Downloads* works on **server-side entitlement + encrypted offline manifests** — spoofing Premium flags locally (what every tweak does for ads/background play) does *not* get you downloadable offline streams. That's why every sideloaded tweak, including YouMod, downloads **real files** instead (Photos / Files app). "Premium-like" therefore means matching the *experience*: queue, resume, progress, background transfers, and playing your library back inside the app.
 
-Suggested steps, smallest first:
+### What YouMod already has (verified in `Download.x`)
 
-1. 🟡 **Queue** — turn `YouModDownloadCoordinator` from a singleton-active model into a serial queue of jobs. Mostly bookkeeping; the range downloader already handles a whole file.
-2. 🔴 **Library screen** — a `YTSettingsPickerViewController`-style section (we already build settings screens from scratch in `Settings.x`) listing `Documents/YouMod Downloads`, with share / delete / play (`AVPlayer`).
-3. 🔴 **Resume** — persist downloaded byte ranges per job next to the file (`.youmod.part` + offsets). The chunk model in `YouModRangeDownloader` already thinks in ranges, so this is a natural fit.
+- Quality picker menu — *"Download video / Choose quality"* + *"Download audio / Choose format"* ✅
+- HTTP range downloader with 8-way chunking (`YouModRangeDownloader`) ✅
+- HLS/DASH handling, AVFoundation mux of video+audio ✅
+- Save to Photos (with permission flow) or share sheet; files live in `Documents/YouMod Downloads`, visible in the Files app ✅
+
+### What's missing vs. Premium (ranked)
+
+| # | Gap | Effort | Notes |
+|---|-----|:------:|-------|
+| 5.1 | **Background transfers** | 🟢 | `Download.x` contains no `beginBackgroundTask` and no background `NSURLSession` config — **downloads stall the moment you leave the app**. Wrap the coordinator in `UIApplication beginBackgroundTaskWithExpirationHandler:`; this alone is the biggest "feels Premium" win. |
+| 5.2 | **Queue** | 🟡 | Starting a second download just shows *"Already downloading"*. Turn `YouModDownloadCoordinator` from singleton-active into a serial job queue. Mostly bookkeeping — the range downloader already handles a whole file. |
+| 5.3 | **Library screen** | 🔴 | Finished files can only be reached through the share sheet (`YouModShareFile`) — there's no in-app list. A `YTSettingsPickerViewController`-style section listing `Documents/YouMod Downloads` with share / delete / play (`AVPlayer`) is the closest analogue to *Library → Downloads*. |
+| 5.4 | **Resume** | 🔴 | Persist completed byte ranges per job next to the file (`.youmod.part` + offsets). The chunk model already thinks in ranges and `stateQueue` already tracks range state — the missing piece is making it survive a relaunch. |
+| 5.5 | **Wi-Fi-only + auto-resume on launch** | 🟢 | Premium's "download over Wi-Fi only" toggle; a `NWPathMonitor` check at job start. |
+| 5.6 | **Shorts entry point** | 🟡 | No download reference exists in `Shorts.x`/`Feed.x` — downloads are only reachable from the standard player menu. |
+| 5.7 | **Progress history** | 🟢 | Currently only a transient toast/alert. |
+
+### Tweaks to learn from / bundle (all verified 2026-09-27)
+
+| Source | Verdict |
+|--------|---------|
+| [arichornlover/YouTube-Reborn-v5](https://github.com/arichornlover/YouTube-Reborn-v5) + [YouTubeRebornPlus](https://github.com/arichornlover/YouTubeRebornPlus) (633★) | 🟡 Best open reference for a **download manager UI** (quality list, audio-only, progress list) — mine the structure, **don't** copy the fetch logic: their own README currently lists *"Downloading videos/audio not working"* on new YouTube versions. |
+| **uYou** (MiRO92) | ⛔ Closed source — `MiRO92/uYou` is 404, only prebuilt debs exist at miro92.com. Can't bundle or build. |
+| **YTLite** (dayanch96) | ⛔ Paid/archived — can't bundle; the free 5.2b4 binary is old. |
+| [arichornlover/YouTubeTweak-Downloads](https://github.com/arichornlover/YouTubeTweak-Downloads) | ⛔ **Not source code** — it's a page of IPA/deb links. Easy to mistake for a tweak. |
+| [BandarHL/YTShortsDownloader](https://github.com/BandarHL/YTShortsDownloader) | ⛔ Unmaintained since 2022 and likely redundant once 5.6 exists. |
+| [asjrx/ASJTube](https://github.com/asjrx/ASJTube) | ⛔ Ships from a third-party apt repo, 25★ — supply-chain risk for a bundled dep. |
+
+**Conclusion:** the downloader itself is one of the better open ones — bundling a second downloader would only produce duplicate menus. The Premium gap is queue + background + library, and all three are native work in `Download.x`.
+
+Suggested implementation order: **5.1 → 5.2 → 5.3 → 5.4**, then 5.5/5.6/5.7 as polish.
 
 ---
 
@@ -121,5 +147,5 @@ Suggested steps, smallest first:
 2. **6.1 + 3.2 + 4.7** — small native wins.
 3. **4.1 (tab reorder)** — the README promises it.
 4. **2.1 version spoofing + 2.2 sign-in fix** — directly closes the two cons listed against us upstream (after verifying YTAppVersionSpoofer on 21.x).
-5. **5.1 download queue** — sets up the library screen.
+5. **§5 downloads** — background transfers first (5.1, 🟢), then queue (5.2), which sets up the library screen (5.3).
 6. **2.4 client spoofing** — the hardest, but removes the biggest "uYouEnhanced is still needed" complaint.
