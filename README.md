@@ -1,31 +1,41 @@
-# YouMod
+<p align=center>
+<img src="https://github.com/grohit1810/YouMod/blob/feature/add-sponsorblock/Icon.png" width="200" height="200"/>
+<h1 align="center">YouMod</h1>
+</p>
+<p align=center>
+<img src="https://img.shields.io/badge/Platform-iOS%20%7C%20iPadOS%2014.0%2B-blue" alt="Badge"/>
+<a href="https://github.com/Tonwalter888/YouMod/releases/latest"><img src="https://custom-icon-badges.demolab.com/github/v/release/Tonwalter888/YouMod?color=brightgreen&label=Latest%20release" alt="Badge"></img></a>
+<a href="https://github.com/Tonwalter888/YouMod/releases/latest"><img src="https://img.shields.io/github/downloads/Tonwalter888/YouMod/total?label=Download" alt="Badge"></img></a>
+</p>
+
 A tweak that's try to recreate features like in YTLite as much as possible. Contributions are welcome! ^^
 
-Thanks for 200 stars and forks! This might be the best project I've done.
+Thanks for 600 stars and 1,400 forks! This might be the best project I've done.
 
 If you want to contribute this project, scroll down to `How to contribute this project?` part.
+
 ## Why I created this project?
 The reason is because of YTLite no longer free. So I'll try my best to recreate all the features as much as I can, plus alternative tweaks combined.
+
 ## Features
 This tweak add a lot of QoL feature and can hide elements in YouTube. Such as:
-- Downloading (video, audio, select quality)
-- Feed modifications (hide shorts, hide post)
-- Appearance modification (OLED theme, keyboard, add/remove buttons)
-- Navigation bar (hide buttons)
-- Player (add/remove buttons and elements)
-- Shorts (add/remove buttons and elements)
-- Tab bar (reorder, add/remove buttons)
-
+- Downloading (Video, Audio, Captions, Thumbnail, Video datails, etc. Currently supports up to 1080p60)
+- Appearance (OLED theme and keyboard)
+- Navigation bar (Hiding buttons)
+- Player (Hiding elements, buttons, and Add custom actions, etc.)
+- Shorts (Hiding elements and Add custom actions)
+- Tab bar (Reorder tabs, Hiding things, etc.)
+- Built-in SponsorBlock
 - And much more!
 
 ## Supported YouTube version
-Up to the latest, this is the goal of this tweak. Any versions starting from 19.x - latest.
+Up to the latest, this is the goal of this tweak. Any versions starting from 19.x - latest and running at least iOS 14.
 
 ## How to build the IPA?
 1. Click on **Sync fork**, and if your branch is out-of-date, click on **Update branch**.
 2. Navigate to **Actions** in your forked repository and select **Build IPA with tweaks**.
 3. Click the **Run workflow** button located on the right side.
-4. Get a decrypted .ipa file (I cannot provide this due to legal reasons.), then upload it to a file provider (e.g., filebin.net,filemail.com,catbox.moe or Dropbox is recommended). Paste the URL of the decrypted IPA file in the provided field. You can also change the BundleID and Display Name if desired.
+4. Get a decrypted .ipa file (I cannot provide this due to legal reasons.), then upload it to a file provider (e.g., filebin.net,filemail.com,catbox.moe, Mega, or Dropbox is recommended). Paste the URL of the decrypted IPA file in the provided field. You can also change the BundleID and Display Name if desired.
 
 **NOTE:** Make sure to provide a direct download link to the file, not a link to a webpage. Otherwise, the process will fail.
 
@@ -46,11 +56,15 @@ This project uses GPLv3 license. See [LICENSE](https://github.com/Tonwalter888/Y
 
 ## Credits
 - [YTLite](https://github.com/dayanch96/YTLite) - dayanch96
+- [YTMusicUltimate](https://github.com/dayanch96/YTMusicUltimate) - dayanch96
 - [OLEDKeyboard](https://github.com/dayanch96/OLEDKeyboard) - dayanch96
 - [YTLitePlus](https://github.com/YTLitePlus/YTLitePlus)
 - [uYouEnhanced](https://github.com/arichornlover/uYouEnhanced) - arichornlover
 - [YTweaks](https://github.com/fosterbarnes/YTweaks) - fosterbarnes
-- [daisuke1227](https://github.com/daisuke1227) - Implementing download features
+- [jefemagril](https://github.com/jefemagril) - Implemented rewind/fast forward buttons to system Control Center
+- [grohit1810](https://github.com/grohit1810) - Implemented built-in SponsorBlock, whole new settings logic, and others
+- [SponsorBlock](https://sponsor.ajay.app) - SponsorBlock segments API
+- [Google Fonts](https://fonts.google.com/icons) - Icons for custom tabs
 - And [PoomSmart](https://github.com/PoomSmart)'s tweaks
 
-Also thanks to all the contributors in the past!
+Also thanks to the other contributors in the past!

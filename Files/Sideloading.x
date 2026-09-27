@@ -1,8 +1,6 @@
 // All Codes are adapt from YTLite and uYouEnhanced + Some of my research
 #import "Headers.h"
 
-extern void YouModConfigureDownloadButton(_ASDisplayView *view);
-
 // AccessGroupID
 static NSString *accessGroupID() {
     NSDictionary *query = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -22,49 +20,6 @@ static NSString *accessGroupID() {
     NSString *accessGroup = [(__bridge NSDictionary *)result objectForKey:(__bridge NSString *)kSecAttrAccessGroup];
     return accessGroup;
 }
-
-// _ASDisplayView filters
-// This hook can hide A LOT of things
-%hook _ASDisplayView
-
-- (void)didMoveToWindow {
-    %orig;
-    // Hot path: this runs for every view that gets attached, so read the identifier
-    // once instead of once per check below.
-    NSString *identifier = self.accessibilityIdentifier;
-    if (identifier.length == 0) return;
-    YouModConfigureDownloadButton(self);
-    // if (IS_ENABLED(HideShortsShelf) && [identifier isEqualToString:@"eml.shorts-shelf"]) self.hidden = YES;
-    if (IS_ENABLED(HideGenMusicShelf) && [identifier isEqualToString:@"feed_nudge.view"]) self.hidden = YES;
-    if (IS_ENABLED(HideFeedPost) && [identifier isEqualToString:@"id.ui.backstage.original_post"]) self.hidden = YES;
-    if (IS_ENABLED(HideLikeButton) && [identifier isEqualToString:@"id.video.like.button"]) self.hidden = YES;
-    if (IS_ENABLED(HideDisLikeButton) && [identifier isEqualToString:@"id.video.dislike.button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShareButton) && [identifier isEqualToString:@"id.video.share.button"]) self.hidden = YES;
-    if (IS_ENABLED(HideDownloadButton) && [identifier isEqualToString:@"id.ui.add_to.offline.button"]) self.hidden = YES;
-    if (IS_ENABLED(HideClipButton) && [identifier isEqualToString:@"clip_button.eml"]) self.hidden = YES;
-    if (IS_ENABLED(HideRemixButton) && [identifier isEqualToString:@"id.video.remix.button"]) self.hidden = YES;
-    if (IS_ENABLED(HideSaveButton) && [identifier isEqualToString:@"id.video.add_to.button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsLikeButton) && [identifier isEqualToString:@"id.reel_like_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsDisLikeButton) && [identifier isEqualToString:@"id.reel_dislike_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsCommentButton) && [identifier isEqualToString:@"id.reel_comment_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsShareButton) && [identifier isEqualToString:@"id.reel_share_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsRemixButton) && [identifier isEqualToString:@"id.reel_remix_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsMetaButton) && [identifier isEqualToString:@"id.reel_pivot_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsProducts) && [identifier isEqualToString:@"product_sticker.main_target"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsProducts) && [identifier isEqualToString:@"product_sticker.secondary_target"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsRecbar) && [identifier isEqualToString:@"id.elements.components.suggested_action"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsCommit) && [identifier isEqualToString:@"eml.shorts-disclosures"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsSubscriptButton) && [identifier isEqualToString:@"id.ui.shorts_paused_state.subscriptions_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsLiveButton) && [identifier isEqualToString:@"id.ui.shorts_paused_state.live_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsLensButton) && [identifier isEqualToString:@"id.ui.shorts_paused_state.lens_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsTrendsButton) && [identifier isEqualToString:@"id.ui.shorts_paused_state.trends_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShortsToVideo) && [identifier isEqualToString:@"id.reel_multi_format_link"]) self.hidden = YES;
-    if (IS_ENABLED(HideSubButton) && [identifier isEqualToString:@"eml.animated_subscribe_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideShoppingButton) && [identifier isEqualToString:@"eml.header_store_button"]) self.hidden = YES;
-    if (IS_ENABLED(HideMemberButton) && [identifier isEqualToString:@"id.sponsor_button"]) self.hidden = YES;
-}
-
-%end
 
 // IAmYouTube (https://github.com/PoomSmart/IAmYouTube)
 %hook YTVersionUtils
@@ -212,6 +167,6 @@ static NSString *accessGroupID() {
         NSURL *documentsURL = [paths lastObject];
         return [documentsURL URLByAppendingPathComponent:@"AppGroup"];
     }
-    return %orig(groupIdentifier);
+    return %orig;
 }
 %end

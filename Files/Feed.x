@@ -1,64 +1,18 @@
 #import "Headers.h"
 
-// YTUnShorts (https://github.com/PoomSmart/YTUnShorts)
-static NSMutableArray <YTIItemSectionRenderer *> *filteredArray(NSArray <YTIItemSectionRenderer *> *array) {
-    NSMutableArray <YTIItemSectionRenderer *> *newArray = [array mutableCopy];
-    NSIndexSet *removeIndexes = [newArray indexesOfObjectsPassingTest:^BOOL(YTIItemSectionRenderer *sectionRenderer, NSUInteger idx, BOOL *stop) {
-        if ([sectionRenderer isKindOfClass:%c(YTIShelfRenderer)]) {
-            YTIShelfSupportedRenderers *content = ((YTIShelfRenderer *)sectionRenderer).content;
-            YTIHorizontalListRenderer *horizontalListRenderer = content.horizontalListRenderer;
-            NSMutableArray <YTIHorizontalListSupportedRenderers *> *itemsArray = horizontalListRenderer.itemsArray;
-            NSIndexSet *removeItemsArrayIndexes = [itemsArray indexesOfObjectsPassingTest:^BOOL(YTIHorizontalListSupportedRenderers *horizontalListSupportedRenderers, NSUInteger idx2, BOOL *stop2) {
-                YTIElementRenderer *elementRenderer = horizontalListSupportedRenderers.elementRenderer;
-                NSString *description = [elementRenderer description];
-                BOOL hasShorts = [description containsString:@"shorts_video_cell"];
-                if (hasShorts) *stop2 = YES;
-                return hasShorts;
-            }];
-            return removeItemsArrayIndexes.count > 0;
-        }
-        if ([sectionRenderer isKindOfClass:%c(YTIItemSectionRenderer)]) {
-            NSString *description = [sectionRenderer description];
-            if ([description containsString:@"shorts_shelf.eml"])
-                return YES;
-        }
-        return NO;
-    }];
-    [newArray removeObjectsAtIndexes:removeIndexes];
-    return newArray;
-}
-
-%group Shorts
-%hook YTInnerTubeCollectionViewController
-
-- (void)displaySectionsWithReloadingSectionControllerByRenderer:(id)renderer {
-    NSMutableArray *sectionRenderers = [self valueForKey:@"_sectionRenderers"];
-    [self setValue:filteredArray(sectionRenderers) forKey:@"_sectionRenderers"];
-    %orig;
-}
-
-- (void)addSectionsFromArray:(NSArray <YTIItemSectionRenderer *> *)array {
-    %orig(filteredArray(array));
-}
-
-%end
-%end
-
 // Hide Subbar
-%hook YTMySubsFilterHeaderView
-- (void)setChipFilterView:(id)arg1 { if (!IS_ENABLED(HideSubbar)) %orig; }
-%end
-
 %hook YTHeaderContentComboView
 - (void)enableSubheaderBarWithView:(id)arg1 { if (!IS_ENABLED(HideSubbar)) %orig; }
-- (void)setFeedHeaderScrollMode:(int)arg1 { IS_ENABLED(HideSubbar) ? %orig(0) : %orig; }
-%end
-
-%hook YTChipCloudCell
-- (void)layoutSubviews {
-    if (self.superview && IS_ENABLED(HideSubbar)) {
-        [self removeFromSuperview];
-    } %orig;
+- (void)setFeedHeaderScrollMode:(int)arg1 { 
+    int temp = IS_ENABLED(HideSubbar) ? 0 : arg1;
+    %orig(temp);
+}
+- (id)initWithChildView:(id)arg1 headerView:(id)arg2 {
+    self = %orig;
+    if (self && IS_ENABLED(HideSubbar)) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setNeedsLayout) name:@"YouModReloadHeaderBar" object:nil];
+    }
+    return self;
 }
 %end
 
@@ -78,10 +32,66 @@ static NSMutableArray <YTIItemSectionRenderer *> *filteredArray(NSArray <YTIItem
 - (id)activeCache { return IS_ENABLED(HideSearchHis) ? nil : %orig; }
 %end
 
-%ctor {
-    YouModRegisterDefaults();
-    %init;
-    if (IS_ENABLED(HideShortsShelf)) {
-        %init(Shorts);
+// Hide related videos in the player
+%hook YTWatchNextResultsViewController
+- (void)setVisibleSections:(NSInteger)sections {
+    if (![self.parentViewController isKindOfClass:%c(YTWatchNextResponseViewController)]) {
+        %orig;
+        return;
+    }
+    NSInteger value = IS_ENABLED(HideRelatedVideos) ? 1 : sections;
+    %orig(value);
+}
+%end
+
+static void YouModFilterChannelButtons(_ASDisplayView *self, NSString *iden) {
+    UIView *sup = self.superview;
+    if ([sup isKindOfClass:%c(ASScrollView)]) {
+        ASScrollView *scroll = (ASScrollView *)sup;
+        ASDisplayNode *node = scroll.scrollNode;
+        for (_ASDisplayView *view in node.yogaChildren) {
+            if ([[view description] containsString:iden]) {
+                [node removeYogaChild:view];
+                [self removeFromSuperview];
+                break;
+            }
+        }
+    } else {
+        UIViewController *con = self._viewControllerForAncestor;
+        if ([con isKindOfClass:%c(YTPageHeaderViewController)]) {
+            _ASDisplayView *dpv = (_ASDisplayView *)sup;
+            ASDisplayNode *node = dpv.keepalive_node;
+            _ASDisplayView *maindpv = (_ASDisplayView *)dpv.superview;
+            ASDisplayNode *mainNode = maindpv.keepalive_node;
+            [mainNode removeYogaChild:node];
+            [dpv removeFromSuperview];
+        } else if ([con isKindOfClass:%c(YTWatchNextResultsViewController)]) {
+            _ASDisplayView *dpv = (_ASDisplayView *)sup;
+            ASDisplayNode *node = dpv.keepalive_node;
+            for (id child in [node.yogaChildren copy]) {
+                if ([[child description] containsString:iden]) {
+                    [node removeYogaChild:child];
+                    [self removeFromSuperview];
+                    break;
+                }
+            }
+        }
     }
 }
+
+%hook _ASDisplayView
+- (void)didMoveToWindow {
+    %orig;
+    NSString *iden = self.accessibilityIdentifier;
+    if (!iden || iden.length == 0) return;
+    BOOL remove = NO;
+    if ([iden isEqualToString:@"eml.header_community_button"] && IS_ENABLED(RemoveChannelCommunityButton)) {
+        remove = YES;
+    } else if ([iden isEqualToString:@"id.sponsor_button"] && IS_ENABLED(RemoveChannelSponsorAll)) {
+        remove = YES;
+    }
+    if (remove) {
+        YouModFilterChannelButtons(self, iden);
+    }
+}
+%end

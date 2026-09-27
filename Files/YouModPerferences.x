@@ -3,21 +3,6 @@
 
 #define Prefix @"YouMod"
 
-static NSBundle *YouModBundle() {
-    static NSBundle *bundle = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSString *tweakBundlePath = [[NSBundle mainBundle] pathForResource:Prefix ofType:@"bundle"];
-        if (tweakBundlePath)
-            bundle = [NSBundle bundleWithPath:tweakBundlePath];
-        else
-            bundle = [NSBundle bundleWithPath:[NSString stringWithFormat:PS_ROOT_PATH_NS(@"/Library/Application Support/%@.bundle"), Prefix]];
-    });
-    return bundle;
-}
-
-#define LOC(x) [YouModBundle() localizedStringForKey:x value:nil table:nil]
-
 @implementation YouModPrefsManager
 
 + (instancetype)sharedManager {
@@ -39,7 +24,7 @@ static NSBundle *YouModBundle() {
     picker.modalPresentationStyle = UIModalPresentationFormSheet;
 
     // Ensure it looks right on iPad
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if (isPad()) {
         picker.popoverPresentationController.sourceView = vc.view;
         picker.popoverPresentationController.sourceRect = CGRectMake(vc.view.bounds.size.width/2, vc.view.bounds.size.height/2, 0, 0);
         picker.popoverPresentationController.permittedArrowDirections = 0;
@@ -57,10 +42,10 @@ static NSBundle *YouModBundle() {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
         alertView.title = LOC(@"ERROR");
         alertView.subtitle = LOC(@"ERROR_INVALID_FILE");
+        alertView.shouldDismissOnBackgroundTap = YES;
         [alertView show];
         return;
     }
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     // Collect the YouMod keys first - never wipe the existing settings before we
     // know the file actually contains anything to import.
     NSMutableDictionary *importedYouModKeys = [NSMutableDictionary dictionary];
@@ -74,9 +59,11 @@ static NSBundle *YouModBundle() {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
         alertView.title = LOC(@"ERROR");
         alertView.subtitle = LOC(@"ERROR_NO_KEYS_IMPORT");
+        alertView.shouldDismissOnBackgroundTap = YES;
         [alertView show];
         return;
     }
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     // Remove old keys
     for (NSString *key in [defaults dictionaryRepresentation]) {
         if ([key hasPrefix:Prefix]) {
@@ -90,10 +77,14 @@ static NSBundle *YouModBundle() {
     [defaults synchronize];
     // Success Alert with Restart
     YTAlertView *alertView = [%c(YTAlertView) confirmationDialogWithAction:^{
-        exit(0);
+        [[UIApplication sharedApplication] performSelector:@selector(suspend)];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            exit(0);
+        });
     } actionTitle:LOC(@"YES")];
     alertView.title = LOC(@"IMPORT_DONE");
     alertView.subtitle = LOC(@"APPLY_DESC"); // "Restart required"
+    alertView.shouldDismissOnBackgroundTap = YES;
     [alertView show];
 }
 
@@ -110,6 +101,7 @@ static NSBundle *YouModBundle() {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
         alertView.title = LOC(@"ERROR");
         alertView.subtitle = LOC(@"ERROR_NO_KEYS_EXPORT");
+        alertView.shouldDismissOnBackgroundTap = YES;
         [alertView show];
         return;
     }
@@ -120,7 +112,7 @@ static NSBundle *YouModBundle() {
     UIDocumentPickerViewController *picker = [[UIDocumentPickerViewController alloc] initForExportingURLs:@[fileURL] asCopy:YES];
     picker.modalPresentationStyle = UIModalPresentationFormSheet;
     
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if (isPad()) {
         picker.popoverPresentationController.sourceView = vc.view;
     }
     [vc presentViewController:picker animated:YES completion:nil];
@@ -136,19 +128,25 @@ static NSBundle *YouModBundle() {
             }
         }
         [defaults setBool:YES forKey:AutoClearCache];
-        [defaults setBool:YES forKey:YTPremiumLogo];
-        [defaults setBool:YES forKey:HideCreateButton];
         [defaults setBool:YES forKey:HideCastButtonNav];
         [defaults setBool:YES forKey:HideCastButtonPlayer];
         [defaults setBool:YES forKey:BackgroundPlayback];
-        [defaults setBool:YES forKey:OldQualityPicker];
-        [defaults setBool:YES forKey:DownloadManager];
-        [defaults setBool:YES forKey:DownloadSaveToPhotos];
+        [defaults setBool:YES forKey:DisableHints];
+        [defaults setInteger:1 forKey:GestureActivationArea];
+        [defaults setInteger:1 forKey:LeftSideGesture];
+        [defaults setInteger:2 forKey:RightSideGesture];
+        [defaults setInteger:1 forKey:GestureHUDSize];
+        [defaults setInteger:1 forKey:YTLogoIndex];
+        [defaults setInteger:2 forKey:DownloadMethod];
         [defaults synchronize];
-        exit(0);
+        [[UIApplication sharedApplication] performSelector:@selector(suspend)];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            exit(0);
+        });
     } actionTitle:LOC(@"YES")];
     alertView.title = LOC(@"WARNING");
     alertView.subtitle = LOC(@"RESETDEFAULT");
+    alertView.shouldDismissOnBackgroundTap = YES;
     [alertView show];
 }
 
